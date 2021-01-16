@@ -1,2 +1,88 @@
-Implement the ImageGallery component that accepts a links prop and renders the gallery described above so that the first item in the links prop is the src attribute of the first image in the gallery. It should also implement the following logic: When the button is clicked, the image that is in the same div as the button should be removed from the gallery.
+You have a GroceryApp component, which receives a list of products, each one with name and votes. The app should render an unordered list, with a list item for each product. Products can be upvoted or downvoted.
 
+By appropriately using React state and props, implement the upvote/downvote logic. Keep the state in the topmost component, while the Product component should accept props.
+
+For example, passing the following array as products prop to GroceryApp [{ name: "Oranges", votes: 0 }, { name: "Bananas", votes: 0 }] and clicking the '+' button next to the Oranges should result in HTML like:
+
+		<div id="root">
+		  <ul>
+		    <li>
+		      <span>Oranges</span> - <span>votes: 1</span><button>+</button> <button>-</button>
+		    </li>
+		    <li>
+		      <span>Bananas</span> - <span>votes: 0</span><button>+</button> <button>-</button>
+		    </li>
+		  </ul>
+		</div>
+
+Solution:
+
+		  const Product = props => {
+		  const plus = () => {
+		    // Call props.onVote to increase the vote count for this product
+		    props.onVote('+',props.index);
+		  };
+		  const minus = () => {
+		    // Call props.onVote to decrease the vote count for this product
+		    props.onVote('-',props.index);
+		  };
+		  return (
+		    <li>
+		      <span>{props.name}</span> - <span>votes: {props.votes}</span>
+		      <button onClick={plus}>+</button>{" "}
+		      <button onClick={minus}>-</button>
+		    </li>
+		  );
+		};
+
+		class GroceryApp extends React.Component {
+
+		   // Finish writing the GroceryApp class
+
+		   constructor(props){
+		   super(props);
+		   this.state = {
+			products: this.props.products
+		   }
+		   }
+
+		  onVote = (dir, index) => {
+		    // Update the products array accordingly ...
+		    const updatedProducts = [...this.state.products];
+		    if(dir==='+'){   
+		    updatedProducts[index].votes = updatedProducts[index].votes+1;
+		      this.setState({
+			products: updatedProducts
+		      })
+		    }
+		    else {
+		      updatedProducts[index].votes = updatedProducts[index].votes-1;
+			this.setState({
+			 products: updatedProducts
+			})
+		    }
+		  };
+
+		  render() {
+		  console.log(this.state.products);
+		    return (
+		      <ul>
+			{
+			  this.state.products.map((item,ind)=>{
+			    return <Product key={item.name} index={ind} onVote = {this.onVote} name={item.name} votes={item.votes}></Product>;
+			  })
+			}
+		      </ul>
+		    );
+		  }
+		}
+
+		document.body.innerHTML = "<div id='root'></div>";
+
+		ReactDOM.render(<GroceryApp
+		  products={[
+		    { name: "Oranges", votes: 0 },
+		    { name: "Apples", votes: 0 },
+		    { name: "Bananas", votes: 0 }
+		  ]}
+		/>, document.getElementById('root'))
